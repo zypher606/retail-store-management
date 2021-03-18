@@ -1,0 +1,20 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Badge component tests matches snapshot 1`] = `
+<div
+  className="makeStyles-folderBadge-3"
+  data-testid="badge-container"
+  style={
+    Object {
+      "background": "#efe112",
+    }
+  }
+>
+  <div>
+    Custom badge in here
+  </div>
+  <p>
+    Another child
+  </p>
+</div>
+`;

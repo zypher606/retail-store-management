@@ -1,0 +1,63 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CustomAccordion component tests matches snapshot 1`] = `
+<div
+  className="MuiPaper-root MuiAccordion-root WithStyles(ForwardRef(Accordion))-root-11 Mui-expanded WithStyles(ForwardRef(Accordion))-expanded-12 MuiPaper-elevation1"
+>
+  <div
+    aria-disabled={false}
+    aria-expanded={true}
+    className="MuiButtonBase-root MuiAccordionSummary-root WithStyles(ForwardRef(AccordionSummary))-root-13 is-expanded Mui-expanded WithStyles(ForwardRef(AccordionSummary))-expanded-15"
+    onBlur={[Function]}
+    onClick={[Function]}
+    onDragLeave={[Function]}
+    onFocus={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
+    onMouseDown={[Function]}
+    onMouseLeave={[Function]}
+    onMouseUp={[Function]}
+    onTouchEnd={[Function]}
+    onTouchMove={[Function]}
+    onTouchStart={[Function]}
+    role="button"
+    tabIndex={0}
+  >
+    <div
+      className="MuiAccordionSummary-content WithStyles(ForwardRef(AccordionSummary))-content-14 Mui-expanded WithStyles(ForwardRef(AccordionSummary))-expanded-15"
+    >
+      my heading for accordion
+    </div>
+  </div>
+  <div
+    className="MuiCollapse-container MuiCollapse-entered"
+    style={
+      Object {
+        "minHeight": "0px",
+      }
+    }
+  >
+    <div
+      className="MuiCollapse-wrapper"
+    >
+      <div
+        className="MuiCollapse-wrapperInner"
+      >
+        <div
+          role="region"
+        >
+          <div
+            className="makeStyles-detailExpanded-9"
+          >
+            <div
+              className="MuiAccordionDetails-root WithStyles(ForwardRef(AccordionDetails))-root-16"
+            >
+              my body for accordion
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
