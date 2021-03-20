@@ -6,7 +6,7 @@ const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     folderBadge: {
       color: '#fff',
-      fontSize: '12px',
+      fontSize: '20px',
       padding: '1px 7px',
       borderRadius: '2px',
       display: 'inline',
@@ -27,6 +27,6 @@ export const Badge = ({
   const classes = useStyles();
 
   return (
-    <div data-testid="badge-container" {...rest} className={classes.folderBadge} style={{background}}>{children}</div>
+    <span data-testid="badge-container" {...rest} className={classes.folderBadge} style={{background}}>{children}</span>
   )
 }

@@ -12,6 +12,8 @@ export const useStyles = makeStyles((theme: any) => ({
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
+    background: "#fff",
+    color: '#000'
   },
   appBarShift: {
     marginLeft: theme.drawerWidth,
@@ -28,6 +30,7 @@ export const useStyles = makeStyles((theme: any) => ({
   menuButton: {
     marginRight: theme.spacing(2),
     minWidth: '33px',
+    color: '#fff',
     background: theme.palette.secondary.main,
   },
   title: {

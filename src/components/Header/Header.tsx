@@ -155,7 +155,7 @@ export const Header = ({
             variant="contained"
             onClick={handleDrawerToggle}
           >
-            <MenuIcon color="primary" />
+            <MenuIcon color="primary" style={{color: '#fff'}} />
           </Button>
           <div className={classes.search}>
             <InputBase

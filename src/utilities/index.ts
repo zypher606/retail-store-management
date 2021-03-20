@@ -39,4 +39,11 @@ export function timeDifference(current: any, previous: any) {
 
   return dd+'/'+mm+'/'+yyyy;
 }
+
+export function getFormattedDate(date: Date) {
+  return `${date.getDate()} ${date.toLocaleString('default', {
+            month: 'short',
+          })} ${date.getFullYear()}`;
+}
+
 export { StorageManager } from "./StorageManager";
