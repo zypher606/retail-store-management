@@ -3,7 +3,7 @@
   "description": "A retail store management appplication where owners can keep track of products",
   "version": "0.1.0",
   "private": true,
-  "main": "public/main.js",
+  "main": "./backend/app.js",
   "author": {
     "name": "Ashim Raj Konwar",
     "email": "ashimrajkonwar@gmail.com"
@@ -27,6 +27,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "socket.io-client": "^4.0.0",
+    "sqlite3": "^5.0.2",
     "typescript": "^4.1.2",
     "web-vitals": "^1.0.1"
   },
@@ -35,7 +36,13 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "electron-dev": "electron ."
+    "backend": "node ./backend/app.js",
+    "dev": "node ./backend/app.js && npm run start",
+    "electron-dev": "concurrently \"cross-env BROWSER=none npm run start\" \"wait-on http://localhost:3000 && electron .\"",
+    "electron-pack": "build --em.main=build/electron.js",
+    "electron-release": "build --em.main=build/electron.js --publish=always",
+    "preelectron-pack": "npm run build",
+    "preelectron-release": "npm run build"
   },
   "eslintConfig": {
     "extends": [
@@ -58,6 +65,7 @@
   "devDependencies": {
     "@types/socket.io-client": "^1.4.36",
     "@types/uuid": "^8.3.0",
+    "ts-node-dev": "^1.1.6",
     "uuid": "^8.3.2"
   }
 }
