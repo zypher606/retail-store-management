@@ -268,6 +268,24 @@ class DbService {
     }
   }
 
+  async fetchAllPurchases() {
+    const PURCAHSES_ALL_QUERY = `
+      SELECT * FROM Purchases 
+    `;
+    const result = await this.SQL3.all(
+      PURCAHSES_ALL_QUERY
+    );
+    if (result && result.length) {
+      return result;
+    }
+  }
+
+  async findPurchasesByBarcode(barcode) {
+    const GET_PURCHASES_BY_BARCODE_QUERY = `SELECT * from PURCHASES WHERE barcode = ?`;
+    let result = await this.SQL3.all(GET_PURCHASES_BY_BARCODE_QUERY, barcode);
+    return result;
+  }
+
   async insertNewInvoice({id, userFullName, userMobile, userAddress, itemCount, grossTotal, gst, discount, netTotal, dateCreated}) {
     const INSERT_NEW_INVOICE_QUERY = `
       INSERT into Invoices 

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createStyles, Theme, withStyles, WithStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -68,13 +68,13 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function AddProductDialog({ open, handleClose, barcode: defaultBarcode, handleProductSave }: any) {
+export default function AddProductDialog({ open, handleClose, scannedBarcode, handleProductSave }: any) {
 
   const classes = useStyles();
   const [name, setName] = useState('');
   const [quantity, setquantity] = useState('1');
   const [mrp, setMrp] = useState('');
-  const [barcode, setBarcode] = useState(defaultBarcode);
+  const [barcode, setBarcode] = useState(scannedBarcode);
   const [buyingPrice, setBuyingPrice] = useState('');
   const [vendorName, setVendorName] = useState('');
   const [vendorMobile, setVendorMobile] = useState('');
@@ -93,6 +93,10 @@ export default function AddProductDialog({ open, handleClose, barcode: defaultBa
     });
     // handleClose();
   }
+
+  useEffect(() => {
+    setBarcode(scannedBarcode)
+  }, [scannedBarcode])
 
   return (
     <div>
@@ -117,7 +121,6 @@ export default function AddProductDialog({ open, handleClose, barcode: defaultBa
                 style={{ flexGrow: 1 }}
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
-                type="number"
               />
               <TextField
                 required

@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const express = require("express");
 const { config } = require('./config/config');
 const routes  = require('./app.routes') ;
+const { initSocketConnection } = require('./services/scanner.service');
 // const { loadDatabase } = require('./utils/database-helpers');
 
 // const db = new Loki(path.resolve(__dirname, './database.json'));
@@ -21,8 +22,23 @@ app.use((req, res, next) => {
 
 app.use("/", routes);
 
+function socketConnectInit() {
+  try {
+    initSocketConnection();
+  } catch (error) {
+
+    setTimeout(() => {
+     
+      console.log(" ======> Restarting to Scanner server")
+      socketConnectInit();
+    }, 5000)
+  }
+}
+socketConnectInit();
+
 app.listen(config.server.port, config.server.host, () => {
   console.log(`==============> Server started at ${config.server.host} on port ${config.server.port}!`);
 });
+
 
 module.exports = app;

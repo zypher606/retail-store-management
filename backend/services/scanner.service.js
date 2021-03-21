@@ -1,72 +1,63 @@
 const getDevices = require('usb-barcode-scanner').getDevices;
 const UsbScanner = require('usb-barcode-scanner').UsbScanner;
-const express = require("express");
 const http = require("http");
+const express = require("express");
 const socketIo = require("socket.io");
 
-const port = process.env.PORT || 4001;
-const index = require("./routes/index");
-
-const app = express();
-app.use(index);
-
-const server = http.createServer(app);
-
-const io = socketIo(server);
-
-let interval;
-
-io.on("connection", (socket) => {
-  console.log("New client connected");
-  if (interval) {
-    clearInterval(interval);
-  }
-  // interval = setInterval(() => getApiAndEmit(socket), 1000);
-
-
-  barCodeScannerInit(socket);
-
-  socket.on("disconnect", () => {
-    console.log("Client disconnected");
-    // clearInterval(interval);
-  });
-});
-
-const getApiAndEmit = socket => {
-  const response = new Date();
-  // Emitting a new message. Will be consumed by the client
-  socket.emit("FromAPI", response);
-};
-
+const port = 4001;
+let connected = false;
+let scanner;
 const barCodeScannerInit = (socket) => {
   const devices = getDevices();
   const target = devices.find(({product}) => product === 'Barcode Scanner');
-  console.log({target})
-  let scanner = new UsbScanner({
-      vendorId: target.vendorId,
-      productId: target.productId
-  });
-  
-  scanner.on('data', (data) => {
+
+  try {
+    scanner = new UsbScanner({
+        vendorId: target.vendorId,
+        productId: target.productId
+    });
+    
+    scanner.on('data', (data) => {
+      console.log("Scanner data: ", {data})
       socket.emit("BARCODE", {barcode: data});
-  });
+    });
+    
+    scanner.startScanning();
+    socket.emit("BARCODE", {isConnected: true});
+  } catch (error) {
+    socket.emit("BARCODE", {isConnected: false});
+    setTimeout(() => {
+      if (!connected) {
+        console.log("======> clearing callbakcs as disconnected");
+        return;
+      }
+      console.log(" ======> reconnecting to USB scanner")
+      barCodeScannerInit(socket);
+    }, 5000)
+  }
   
-  scanner.startScanning();
 }
 
-server.listen(port, () => console.log(`Listening on port ${port}`));
- 
+function initSocketConnection() {
+  const app = express();
 
-// const devices = getDevices();
-// const target = devices.find(({product}) => product === 'Barcode Scanner');
-// console.log({target})
-// let scanner = new UsbScanner({
-//     vendorId: target.vendorId,
-//     productId: target.productId
-// });
- 
-// scanner.on('data', (data) => {
-//     console.log(data);
-// });
- 
-// scanner.startScanning();
+  const server = http.createServer(app);
+
+  const io = socketIo(server);
+
+  io.on("connection", (socket) => {
+    console.log("New client connected");
+    connected = true;
+    barCodeScannerInit(socket);
+    
+    socket.on("disconnect", () => {
+      console.log("Client disconnected");
+      connected = false;
+      scanner.stopScanning();
+    });
+  });
+
+  server.listen(port, () => console.log(`==============> Socket Server listening on port ${port}`));
+}
+
+exports.initSocketConnection = initSocketConnection

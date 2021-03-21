@@ -62,9 +62,10 @@ interface IProductCard {
   quantity: number;
   dateUpdated: any;
   barcode?: string;
+  vendors: any[];
 }
 
-export default function ProductCard({name, price, quantity, dateUpdated, barcode}: IProductCard) {
+export default function ProductCard({name, price, quantity, dateUpdated, barcode, vendors=[]}: IProductCard) {
 
   const classes = useStyles();
   const [expanded, setExpanded] = React.useState(false);
@@ -120,7 +121,7 @@ export default function ProductCard({name, price, quantity, dateUpdated, barcode
       </CardActions>
       <Collapse in={expanded} timeout="auto" unmountOnExit>
         <CardContent>
-          <VendorList title="Vendors" purchases={[{vendor: 'Hello', }]} />
+          <VendorList title="Vendors" purchases={vendors} />
         </CardContent>
       </Collapse>
     </Card>

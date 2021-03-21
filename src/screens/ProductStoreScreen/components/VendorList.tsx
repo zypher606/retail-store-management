@@ -55,9 +55,9 @@ export default function VendorList({purchases, title}: IVendorList) {
       className={classes.root}
     >
       {
-        purchases.map(({vendor, price, quantity, date}: any, index) => (
+        purchases.map(({vendorFullName, price, quantity, dateCreated}: any, index) => (
           <ListItem button>
-            <ListItemText primary={`${index + 1}. ${vendor}`} />
+            <ListItemText primary={`${index + 1}. ${vendorFullName}: ₹${price} x (${quantity} items) `} />
           </ListItem>
         ))
       }

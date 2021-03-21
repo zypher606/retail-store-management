@@ -30,8 +30,7 @@ export const dispatch = store.dispatch;
 const resolveMapStateToProps = (mapFn: any) => {
   return (state: any) => {
     const defaultMappedState = {
-      user: state.user,
-      email: state.email,
+      productList: state.product.productList,
     };
     return { ...defaultMappedState, ...(mapFn && mapFn(state)) };
   };

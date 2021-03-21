@@ -10,7 +10,7 @@ interface IAppContainerProps {
   history: any;
   user: any;
   location: any;
-  product: any;
+  productList: any[];
 }
 
 export const AppContainer = withRouter<any, any>(
@@ -20,7 +20,7 @@ export const AppContainer = withRouter<any, any>(
       history,
       user,
       location,
-      product,
+      productList,
     } = props;
 
     const { pathname } = location;

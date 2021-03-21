@@ -58,6 +58,7 @@ export function SalesScreen() {
   const [products, setProducts] = useState(mockProducts);
   const [openAddNewProductDialog, setOpenAddNewProductDialog] = useState(false);
   const [scannedBarcode, setScannedBarcode] = useState('');
+  const [scannerIsConnected, setScannerIsConnected] = useState(false);
 
   const handleDrawerStateChange = (state: boolean) => {
     setIsDrawerOpen(state);
@@ -114,7 +115,7 @@ export function SalesScreen() {
   
   return (
     <div className="dashboard-container">
-      <Navigation unreadCount={1} profile={{}} handleDrawerToggle={handleDrawerStateChange}/>
+      <Navigation scannerIsConnected={scannerIsConnected}  unreadCount={1} profile={{}} handleDrawerToggle={handleDrawerStateChange}/>
 
       <Container
         className={clsx(classes.container, {

@@ -73,7 +73,17 @@ class ProductController {
   fetchAllProductsWithVendorData = () => {}
 
   fetchAllProduct = async (req, res) => {
-    const result = await DbService.fetchAllProduct();
+    let result = await DbService.fetchAllProduct();
+    if (result) {
+      result = await Promise.all(result.map(async (product) => {
+        product.vendors = [];
+        const vendors = await DbService.findPurchasesByBarcode(product.barcode);
+        if (vendors && vendors.length) {
+          product.vendors = vendors;
+        }
+        return product;
+      }));
+    }
     res.status(200).send(new ResponseUtil(200, 'Results fetched successfully!!', result));
   }
 

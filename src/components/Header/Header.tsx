@@ -20,16 +20,19 @@ import { sideDrawerWidth as drawerWidth } from '../../styles';
 import { StorageManager } from '../../utilities';
 import { useHistory, useLocation } from 'react-router-dom';
 import { Routes } from '../../appRoutes/RouteMappings';
+import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 
 interface IHeader {
   isDrawerOpen: any;
   handleDrawerToggle: any;
   unreadCount: number;
+  scannerIsConnected: boolean;
 }
 export const Header = ({
   isDrawerOpen,
   handleDrawerToggle,
   unreadCount,
+  scannerIsConnected,
 }: IHeader) => {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
@@ -169,6 +172,16 @@ export const Header = ({
           </div>
           <div className={classes.grow} />
           <div className={classes.sectionDesktop}>
+            <div
+              style={{
+                lineHeight: '26px',
+                display: 'flex',
+                marginTop: '10px',
+              }}
+            >
+              <FiberManualRecordIcon style={{color: scannerIsConnected ? 'green' : 'red'}} />
+              {scannerIsConnected ? 'Connected' : 'Disconnected'}
+            </div>
             <IconButton aria-label="show 4 new mails">
               <Badge 
                 badgeContent={

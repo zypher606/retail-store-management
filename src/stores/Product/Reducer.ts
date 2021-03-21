@@ -36,7 +36,7 @@ export default function reducer(
         loading: true,
       };
     case PRODUCT_FETCH_ALL_SUCCESS:
-      return { ...state, productList: response.data };
+      return { ...state, productList: response.data.data };
     case PRODUCT_FETCH_ALL_ERROR:
       return { ...state, error: error };
     default:
