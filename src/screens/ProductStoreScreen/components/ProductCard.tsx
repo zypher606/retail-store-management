@@ -16,6 +16,7 @@ import ShareIcon from '@material-ui/icons/Share';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import productImage from '../../../assets/images/paella.jpeg';
+import productSplashImage from '../../../assets/images/image-holder.png';
 import { Badge } from '../../../components';
 import Chip from '@material-ui/core/Chip';
 import { getFormattedDate } from '../../../utilities';
@@ -90,7 +91,7 @@ export default function ProductCard({name, price, quantity, dateUpdated, barcode
       />
       <CardMedia
         className={classes.media}
-        image={productImage}
+        image={productSplashImage}
         title="Paella dish"
       />
       <CardContent>

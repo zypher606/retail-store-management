@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme, useMediaQuery, Container, Grid, Hidden, Paper, Button, InputBase, IconButton, Fab, Snackbar } from '@material-ui/core';
-import { Sidebar, Navigation } from '../../components';
+import { Sidebar, Navigation, ItemQuantity } from '../../components';
 import clsx from 'clsx';
 import AddProductDialog from './components/AddProductDialog';
 import AddIcon from '@material-ui/icons/Add';
@@ -150,7 +150,7 @@ export function SalesScreen() {
                     <TableCell>Item Name</TableCell>
                     <TableCell align="left">Barcode</TableCell>
                     <TableCell align="right">Price</TableCell>
-                    <TableCell align="right">Quantity</TableCell>
+                    <TableCell align="center">Quantity</TableCell>
                     <TableCell align="right">Sub Total</TableCell>
                   </TableRow>
                 </TableHead>
@@ -162,8 +162,12 @@ export function SalesScreen() {
                       </TableCell>
                       <TableCell align="left">{row.calories}</TableCell>
                       <TableCell align="right">{row.fat}</TableCell>
-                      <TableCell align="right">{row.carbs}</TableCell>
-                      <TableCell align="right">{row.protein}</TableCell>
+                      <TableCell align="center">
+                        <ItemQuantity quantity={2} itemsAvailable={4} handleChange={() => {}}/> 
+                      </TableCell>
+                      <TableCell align="right">
+                        2
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
