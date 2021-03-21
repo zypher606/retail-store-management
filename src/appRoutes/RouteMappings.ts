@@ -1,10 +1,12 @@
 import { Router } from '@material-ui/icons';
 import {
   ProductStoreScreen,
+  SalesScreen,
 } from '../screens';
 
 export const Routes = {
   DEFAULT: '/',
+  SALES_SCREEN: '/sales',
   LOGIN: '/login',
   REGISTER: '/register',
   MAILBOX: '/mailbox',
@@ -23,11 +25,11 @@ export const RouteMappings: IRoute[] = [
     component: ProductStoreScreen,
     isProtected: false,
   },
-  // {
-  //   path: Routes.LOGIN,
-  //   component: LoginScreen,
-  //   isProtected: false,
-  // },
+  {
+    path: Routes.SALES_SCREEN,
+    component: SalesScreen,
+    isProtected: false,
+  },
   // {
   //   path: Routes.REGISTER,
   //   component: RegisterScreen,

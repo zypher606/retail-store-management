@@ -8,8 +8,10 @@ import AddProductDialog from './components/AddProductDialog';
 import AddIcon from '@material-ui/icons/Add';
 import socketIOClient from "socket.io-client";
 import { sideDrawerWidth as drawerWidth } from '../../styles';
+import { productFetchAll } from "../../stores/actions";
 import { useStyles } from './styles';
 import './styles.scss';
+import { addProductPurchase } from '../../helpers/private-api.helper';
 
 const ENDPOINT = "localhost:4001";
 
@@ -34,13 +36,9 @@ export function ProductStoreScreen() {
   const classes = useStyles();
   const theme = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [searchBoxFocused, setSearchBoxFocused] = useState(false);
-  const [isComposeEmailDialogOpen, setIsComposeEmailDialogOpen] = useState(false);
-  const [openEmailDeleteSuccess, setOpenEmailDeleteSuccess] = useState(false);
   const [products, setProducts] = useState(mockProducts);
   const [openAddNewProductDialog, setOpenAddNewProductDialog] = useState(false);
   const [scannedBarcode, setScannedBarcode] = useState('');
-  const selectedEmails = new Set(); 
 
   const handleDrawerStateChange = (state: boolean) => {
     setIsDrawerOpen(state);
@@ -54,10 +52,14 @@ export function ProductStoreScreen() {
       handleNewScan(barcode)
     });
 
+    productFetchAll();
+
     // CLEAN UP THE EFFECT
     return () => {
       socket.disconnect();
     }
+
+    
   }, []);
 
   const handleNewScan = (barcode: any) => {
@@ -81,8 +83,10 @@ export function ProductStoreScreen() {
   }
 
   const handleProductSave = (product: any) => {
-    console.log({product})
-    setProducts([...products, {...product, dateUpdated: Date.now()}])
+    addProductPurchase(product).then((res) => {
+      console.log("=======> added", res)
+    })
+    // setProducts([...products, {...product, dateUpdated: Date.now()}])
   }
 
 
@@ -125,11 +129,12 @@ export function ProductStoreScreen() {
             ))
           }
         </div>
-        
-
 
         <Fab className={classes.composeFabBtn} color="secondary" aria-label="add">
-          <AddIcon onClick={() => setOpenAddNewProductDialog(true)} />
+          <AddIcon onClick={() => {
+              setOpenAddNewProductDialog(true);
+            }} 
+          />
         </Fab>
 
       </Container>

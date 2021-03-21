@@ -2,7 +2,7 @@ import React from 'react';
 import { Route, HashRouter, Switch } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
 import { RouteMappings, IRoute } from './RouteMappings';
-// import { AppContainer } from "../AppContainer";
+import { AppContainer } from "../AppContainer";
 
 interface IAppRouter {
   authenticated: boolean;
@@ -12,7 +12,7 @@ export const AppRouter = ({ authenticated }: IAppRouter) => {
 
   return (
     <HashRouter>
-      {/* <AppContainer> */}
+      <AppContainer>
         <Switch>
           {RouteMappings.map(
             ({ isProtected, component: Component, path }: IRoute) => {
@@ -43,7 +43,7 @@ export const AppRouter = ({ authenticated }: IAppRouter) => {
             }
           )}
         </Switch>
-      {/* </AppContainer> */}
+      </AppContainer>
     </HashRouter>
   )
 }

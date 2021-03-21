@@ -39,11 +39,11 @@ class DbService {
     const GET_CUSTOMER_QUERY = `SELECT id from Customer WHERE fullName = ?`;
     const INSERT_CUSTOMER_QUERY = `INSERT into Customer (fullName) VALUES(?)`;
 
-    let result = await SQL3.get(GET_CUSTOMER_QUERY, fullName);
+    let result = await this.SQL3.get(GET_CUSTOMER_QUERY, fullName);
     if (result && result.id) {
       return result.id;
     } else {
-      result = await SQL3.run(INSERT_CUSTOMER_QUERY, fullName);
+      result = await this.SQL3.run(INSERT_CUSTOMER_QUERY, fullName);
       if (result && result.lastID) {
         return result.lastID;
       }
@@ -52,7 +52,7 @@ class DbService {
 
   async insertPurchase(customerId, itemName, price) {
     const INSERT_PURCHASE_QUERY = `INSERT into Purchase (customerId, itemName, price) VALUES(?,?,?)`;
-    const result = await SQL3.run(
+    const result = await this.SQL3.run(
       INSERT_PURCHASE_QUERY,
       customerId,
       itemName,
@@ -80,7 +80,7 @@ class DbService {
         Purchase.id ASC
   `;
 
-    const results = await SQL3.all(GET_ALL_RECORDS_QUERY);
+    const results = await this.SQL3.all(GET_ALL_RECORDS_QUERY);
     if (results && results.length) {
       return results;
     }
@@ -109,6 +109,7 @@ class DbService {
       CREATE TABLE IF NOT EXISTS Products(
         id VARCHAR(200),
         name VARCHAR(500),
+        description VARCHAR(500),
         quantity INT(50),
         price INT(50),
         barcode VARCHAR(200),
@@ -127,7 +128,9 @@ class DbService {
     const PURCHASES_NEW_TABLE_QUERY = `
       CREATE TABLE IF NOT EXISTS Purchases(
         id VARCHAR(200),
-        vendor VARCHAR(500),
+        vendorFullName VARCHAR(500),
+        vendorMobile VARCHAR(100),
+        vendorAddress VARCHAR(500),
         quantity INT(50),
         price INT(50),
         barcode VARCHAR(200),
@@ -210,7 +213,105 @@ class DbService {
     }
   }
 
+  async fetchAllProduct() {
+    const PRODUCT_ALL_QUERY = `
+      SELECT * FROM Products 
+    `;
+    const result = await this.SQL3.all(
+      PRODUCT_ALL_QUERY
+    );
+    if (result && result.length) {
+      return result;
+    }
+  }
 
+  async findProductByBarcde(barcode) {
+    const GET_PRODUCT_QUERY = `SELECT * from Products WHERE barcode = ?`;
+    let result = await this.SQL3.get(GET_PRODUCT_QUERY, barcode);
+    return result;
+  }
+
+  async updateProductByBarcode({id, name, description, quantity, price, barcode, brandId, dateUpdated}) {
+    const UPDATE_PRODUCT_QUERY = `
+      UPDATE Products
+      SET name=?, description=?, quantity=?, price=?, brandId=?, dateUpdated=?
+      WHERE barcode=?;
+    `;
+    let result = await this.SQL3.run(UPDATE_PRODUCT_QUERY, name, description, quantity, price, brandId, dateUpdated, barcode);
+    
+    if (result && result.lastID) {
+      return result.lastID;
+    }
+    return result;
+  }
+
+  // Products
+  async insertNewPurchase({id, vendorFullName, vendorMobile, vendorAddress, quantity, price, barcode, dateCreated}) {
+    const INSERT_NEW_PURCHASE_QUERY = `
+      INSERT into Purchases 
+        (id, vendorFullName, vendorMobile, vendorAddress, quantity, price, barcode, dateCreated) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const result = await this.SQL3.run(
+      INSERT_NEW_PURCHASE_QUERY,
+      id, 
+      vendorFullName,
+      vendorMobile,
+      vendorAddress,
+      quantity, 
+      price, 
+      barcode, 
+      dateCreated
+    );
+    if (result && result.lastID) {
+      return result.lastID;
+    }
+  }
+
+  async insertNewInvoice({id, userFullName, userMobile, userAddress, itemCount, grossTotal, gst, discount, netTotal, dateCreated}) {
+    const INSERT_NEW_INVOICE_QUERY = `
+      INSERT into Invoices 
+        (id, userFullName, userMobile, userAddress, itemCount, grossTotal, gst, discount, netTotal, dateCreated) 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const result = await this.SQL3.run(
+      INSERT_NEW_INVOICE_QUERY,
+      id, 
+      userFullName,
+      userMobile,
+      userAddress,
+      itemCount, 
+      grossTotal, 
+      gst,
+      discount,
+      netTotal,
+      dateCreated
+    );
+    if (result && result.lastID) {
+      return result.lastID;
+    }
+  }
+
+  async insertNewSalesEntry({id, invoiceId, productId, quantity, price, barcode, dateCreated}) {
+    const INSERT_NEW_INVOICE_QUERY = `
+      INSERT into Invoices 
+        (id, invoiceId, productId, quantity, price, barcode, dateCreated) 
+        VALUES(?, ?, ?, ?, ?, ?, ?)
+    `;
+    const result = await this.SQL3.run(
+      INSERT_NEW_INVOICE_QUERY,
+      id, 
+      invoiceId,
+      productId, 
+      quantity, 
+      price, 
+      barcode, 
+      dateCreated
+    );
+    if (result && result.lastID) {
+      return result.lastID;
+    }
+  }
 }
 
 const dbServiceInstance = DbService.getInstance();
