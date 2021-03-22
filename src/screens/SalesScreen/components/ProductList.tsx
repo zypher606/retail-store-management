@@ -29,11 +29,6 @@ const useStyles = makeStyles((theme: Theme) =>
 
 export default function ProductList({productList=[], handleItemSelect}: any) {
   const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
-
-  const handleClick = () => {
-    setOpen(!open);
-  };
 
   return (
     <List

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import iconMinus from '../../assets/images/minus-solid.svg';
 import iconPlus from '../../assets/images/plus-solid.svg';
 import './ItemQuantity.scss';
@@ -24,6 +24,10 @@ export const ItemQuantity = ({ quantity, itemsAvailable, handleChange, handleIte
     setQualtityValue(result);
     handleChange(result);
   };
+
+  useEffect(() => {
+    setQualtityValue(quantity);
+  }, [quantity])
 
   return (
     <div className='quantity d-flex'>

@@ -34,7 +34,7 @@ function socketConnectInit() {
     }, 5000)
   }
 }
-// socketConnectInit();
+socketConnectInit();
 
 app.listen(config.server.port, config.server.host, () => {
   console.log(`==============> Server started at ${config.server.host} on port ${config.server.port}!`);

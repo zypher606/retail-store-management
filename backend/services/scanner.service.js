@@ -53,7 +53,9 @@ function initSocketConnection() {
     socket.on("disconnect", () => {
       console.log("Client disconnected");
       connected = false;
-      scanner.stopScanning();
+      try {
+        scanner.stopScanning();
+      } catch (error) {}
     });
   });
 

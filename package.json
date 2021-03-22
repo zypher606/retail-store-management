@@ -3,7 +3,9 @@
   "description": "A retail store management appplication where owners can keep track of products",
   "version": "0.1.0",
   "private": true,
-  "main": "./backend/app.js",
+  "productName": "Electron Create React App Example",
+  "main": "./public/electron.js",
+  "homepage": "./",
   "author": {
     "name": "Ashim Raj Konwar",
     "email": "ashimrajkonwar@gmail.com"
@@ -76,6 +78,7 @@
   },
   "devDependencies": {
     "@types/redux-logger": "^3.0.8",
+    "electron-builder": "^22.10.5",
     "redux-devtools-extension": "^2.13.9",
     "redux-logger": "^3.0.6",
     "ts-node-dev": "^1.1.6"
