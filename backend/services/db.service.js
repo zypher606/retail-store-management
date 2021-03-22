@@ -146,8 +146,10 @@ class DbService {
         userMobile VARCHAR(500),
         userAddress VARCHAR(500),
         itemCount INT(50),
+        grossTotal INT(50),
+        tax INT(50),
         discount INT(50),
-        total INT(50),
+        netTotal INT(50),
         dateCreated TIMESTAMP
       );
     `;
@@ -289,7 +291,7 @@ class DbService {
   async insertNewInvoice({id, userFullName, userMobile, userAddress, itemCount, grossTotal, gst, discount, netTotal, dateCreated}) {
     const INSERT_NEW_INVOICE_QUERY = `
       INSERT into Invoices 
-        (id, userFullName, userMobile, userAddress, itemCount, grossTotal, gst, discount, netTotal, dateCreated) 
+        (id, userFullName, userMobile, userAddress, itemCount, grossTotal, tax, discount, netTotal, dateCreated) 
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
     const result = await this.SQL3.run(
@@ -312,7 +314,7 @@ class DbService {
 
   async insertNewSalesEntry({id, invoiceId, productId, quantity, price, barcode, dateCreated}) {
     const INSERT_NEW_INVOICE_QUERY = `
-      INSERT into Invoices 
+      INSERT into Sales 
         (id, invoiceId, productId, quantity, price, barcode, dateCreated) 
         VALUES(?, ?, ?, ?, ?, ?, ?)
     `;

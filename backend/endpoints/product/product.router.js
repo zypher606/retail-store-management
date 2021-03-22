@@ -8,5 +8,6 @@ routes.use("/add", productControllerInstance.add);
 routes.post("/addNewProduct", productControllerInstance.addProductWithVendorDetails);
 routes.post("/addPurchase", productControllerInstance.addPurchase);
 routes.get("/all", productControllerInstance.fetchAllProduct);
+routes.post("/placeOrder", productControllerInstance.placeOrder);
 
 module.exports = routes;

@@ -7,13 +7,19 @@ interface IItemQuantity {
   quantity: number;
   itemsAvailable?: number;
   handleChange: (value: number) => void;
+  handleItemDelete?: () => void;
 }
-export const ItemQuantity = ({ quantity, itemsAvailable, handleChange }: IItemQuantity) => {
+export const ItemQuantity = ({ quantity, itemsAvailable, handleChange, handleItemDelete=() => {} }: IItemQuantity) => {
   const [quantityValue, setQualtityValue] = useState(quantity);
 
   const changeQuantity = (value: number) => {
     const result = quantityValue + value;
-    if (result < 1 || (itemsAvailable && result > itemsAvailable)) return;
+
+    if (result < 1) {
+      handleItemDelete();
+      return;
+    }
+    if (itemsAvailable && result > itemsAvailable) return;
 
     setQualtityValue(result);
     handleChange(result);

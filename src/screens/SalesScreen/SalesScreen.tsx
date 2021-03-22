@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useTheme, useMediaQuery, Container, Grid, Hidden, Paper, Button, InputBase, IconButton, Fab, Snackbar } from '@material-ui/core';
+import { useTheme, useMediaQuery, Container, Grid, Hidden, Paper, Button, InputBase, IconButton, Fab, Snackbar, Card } from '@material-ui/core';
 import { Sidebar, Navigation, ItemQuantity } from '../../components';
 import clsx from 'clsx';
 import AddProductDialog from './components/AddProductDialog';
@@ -9,7 +9,7 @@ import { sideDrawerWidth as drawerWidth } from '../../styles';
 import { productFetchAll } from "../../stores/actions";
 import { useStyles } from './styles';
 import './styles.scss';
-import { addProductPurchase } from '../../helpers/private-api.helper';
+import { addProductPurchase, placeOrder } from '../../helpers/private-api.helper';
 import { makeStyles } from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -18,8 +18,9 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import ProductList from './components/ProductList';
+import { connect } from '../../stores';
 
-const ENDPOINT = "localhost:4001";
+const SOCKET_ENDPOINT = "localhost:4001";
 
 const mockProducts = [
   {
@@ -38,38 +39,35 @@ const mockProducts = [
   }
 ]
 
-function createData(name: string, calories: number, fat: number, carbs: number, protein: number) {
-  return { name, calories, fat, carbs, protein };
-}
-
-const rows = [
-  createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-  createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-  createData('Eclair', 262, 16.0, 24, 6.0),
-  createData('Cupcake', 305, 3.7, 67, 4.3),
-  createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
-
-
-export function SalesScreen() {
+export const SalesScreen = connect((state: any) => ({
+  productList: state?.product?.productList,
+}))(({productList=[]}: any) => {
   const classes = useStyles();
   const theme = useTheme();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [products, setProducts] = useState(mockProducts);
   const [openAddNewProductDialog, setOpenAddNewProductDialog] = useState(false);
   const [scannedBarcode, setScannedBarcode] = useState('');
   const [scannerIsConnected, setScannerIsConnected] = useState(false);
+  const [cartItems, setCartItems] = useState<any[]>([]);
 
   const handleDrawerStateChange = (state: boolean) => {
     setIsDrawerOpen(state);
   }
 
   useEffect(() => {
-    const socket = socketIOClient(ENDPOINT, { transports : ['websocket'] });
-    socket.on("BARCODE", ({barcode}: any) => {
-      // setResponse(data);
-      // console.log("DATA ========> ", {data})
-      handleNewScan(barcode)
+    const socket = socketIOClient(SOCKET_ENDPOINT, { transports : ['websocket'] });
+    socket.on("BARCODE", ({barcode, isConnected}: any) => {
+      if (isConnected !== undefined) {
+        setScannerIsConnected(isConnected);
+      }
+
+      console.log({barcode})
+
+      if(barcode) {
+        // setScannedBarcode(barcode);
+        // setOpenAddNewProductDialog(true);
+        handleNewScan(barcode);
+      }
     });
 
     productFetchAll();
@@ -78,28 +76,21 @@ export function SalesScreen() {
     return () => {
       socket.disconnect();
     }
-
     
   }, []);
 
   const handleNewScan = (barcode: any) => {
 
-    setScannedBarcode(barcode);
-    const existingProduct = products.find(({barcode: existingBarcode}: any) => (
-                                existingBarcode === barcode
-                              ));
-    
-    if (!existingProduct) {
-      setOpenAddNewProductDialog(true);
-    } else {
-      const updatedProducts = products.map((product: any) => {
-        if (product.barcode === barcode) {
-          product.quantity += 1;
-        }
-        return product;
-      })
-      setProducts(updatedProducts);
+  }
+
+  const handlePlaceOrder = () => {
+    const payload = {
+      products: cartItems,
+      netTotal: getTotalAmount(cartItems),
     }
+    placeOrder(payload).then((res: any) => {
+      console.log("=======> placed", res)
+    })
   }
 
   const handleProductSave = (product: any) => {
@@ -109,7 +100,32 @@ export function SalesScreen() {
     // setProducts([...products, {...product, dateUpdated: Date.now()}])
   }
 
+  const handleItemSelect = (product: any) => {
+    const exists = cartItems.find(({barcode}: any) => barcode === product.barcode);
+    if (!exists) {
+      setCartItems([...cartItems, {...product, availableCount: product.quantity, selectedCount: 1}])
+    }
+  }
 
+  const handleQuantityChange = (id: string, value: number) => {
+    const items = cartItems.map((item: any) => {
+      if (id === item.id) {
+        return {...item, selectedCount: value}
+      }
+      return item;
+    });
+    setCartItems(items);
+  }
+
+  const handleCartItemDelete = (id: string) => {
+    const items = cartItems.filter((item: any) => item.id !== id);
+    setCartItems(items);
+  }
+
+  const getTotalAmount = (items: any[]) => {
+    const amount = items.map(({selectedCount, price}) => selectedCount * price)
+    return amount.reduce((a, b) => a + b, 0);
+  }
  
   const disableSlider = !useMediaQuery(theme.breakpoints.up('sm'));
   
@@ -132,103 +148,119 @@ export function SalesScreen() {
         <div className="sales-container" style={{ display: 'flex' }}>
           <div
             style={{ 
-              flexGrow: 0.5,
+              flexGrow: 0.2,
             }}
           >
-            <ProductList />
+            <ProductList productList={productList} handleItemSelect={handleItemSelect} />
           </div>
           <div 
             style={{ 
               flexGrow: 1,
-              maxHeight: '600px',
+              maxHeight: '550px',
               overflowY: 'scroll',
             }}
           >
             <TableContainer component={Paper}>
-              <Table className={classes.table} aria-label="simple table">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Item Name</TableCell>
-                    <TableCell align="left">Barcode</TableCell>
-                    <TableCell align="right">Price</TableCell>
-                    <TableCell align="center">Quantity</TableCell>
-                    <TableCell align="right">Sub Total</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {rows.map((row) => (
-                    <TableRow key={row.name}>
+              {
+                cartItems.length > 0 &&
+                <Table className={classes.table} aria-label="simple table">
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Item Name</TableCell>
+                      <TableCell align="left">Barcode</TableCell>
+                      <TableCell align="right">Price</TableCell>
+                      <TableCell align="center">Quantity</TableCell>
+                      <TableCell align="right">Sub Total</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {cartItems.map((item) => (
+                      <TableRow key={item.id}>
+                        <TableCell component="th" scope="row">
+                          {item.name}
+                        </TableCell>
+                        <TableCell align="left">{item.barcode}</TableCell>
+                        <TableCell align="right">₹{item.price}</TableCell>
+                        <TableCell align="center">
+                          <ItemQuantity 
+                            quantity={item.selectedCount} 
+                            itemsAvailable={item.availableCount} 
+                            handleChange={(value) => handleQuantityChange(item.id, value)}
+                            handleItemDelete={() => handleCartItemDelete(item.id)}
+                          /> 
+                        </TableCell>
+                        <TableCell align="right">
+                          ₹{item.price * item.selectedCount}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+
+  {/*                 
+                  <TableBody>
+                    <TableRow>
                       <TableCell component="th" scope="row">
-                        {row.name}
                       </TableCell>
-                      <TableCell align="left">{row.calories}</TableCell>
-                      <TableCell align="right">{row.fat}</TableCell>
-                      <TableCell align="center">
-                        <ItemQuantity quantity={2} itemsAvailable={4} handleChange={() => {}}/> 
+                      <TableCell align="left"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right">
+                        <strong>GROSS TOTAL</strong>
+                      </TableCell>
+                      <TableCell align="right">13 %</TableCell>
+                    </TableRow>
+                  </TableBody> */}
+
+                  {/* <TableBody>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                      </TableCell>
+                      <TableCell align="left"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right">
+                        <strong>TAX</strong>
+                      </TableCell>
+                      <TableCell align="right">13 %</TableCell>
+                    </TableRow>
+                  </TableBody>
+                  */}
+
+                  {/* <TableBody>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                      </TableCell>
+                      <TableCell align="left"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right">
+                        <strong>DISCOUNT</strong>
+                      </TableCell>
+                      <TableCell align="right">-200</TableCell>
+                    </TableRow>
+                  </TableBody> */}
+
+                  <TableBody>
+                    <TableRow>
+                      <TableCell component="th" scope="row">
+                      </TableCell>
+                      <TableCell align="left"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right">
+                        <strong>NET TOTAL</strong>
                       </TableCell>
                       <TableCell align="right">
-                        2
+                        <strong>₹{getTotalAmount(cartItems)}</strong>
                       </TableCell>
                     </TableRow>
-                  ))}
-                </TableBody>
+                  </TableBody>
+                  
+                </Table>
+              }
 
-                <TableBody>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                    </TableCell>
-                    <TableCell align="left"></TableCell>
-                    <TableCell align="right"></TableCell>
-                    <TableCell align="right">
-                      <strong>GROSS TOTAL</strong>
-                    </TableCell>
-                    <TableCell align="right">13 %</TableCell>
-                  </TableRow>
-                </TableBody>
-
-                <TableBody>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                    </TableCell>
-                    <TableCell align="left"></TableCell>
-                    <TableCell align="right"></TableCell>
-                    <TableCell align="right">
-                      <strong>TAX</strong>
-                    </TableCell>
-                    <TableCell align="right">13 %</TableCell>
-                  </TableRow>
-                </TableBody>
-
-                
-                {/* <TableBody>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                    </TableCell>
-                    <TableCell align="left"></TableCell>
-                    <TableCell align="right"></TableCell>
-                    <TableCell align="right">
-                      <strong>DISCOUNT</strong>
-                    </TableCell>
-                    <TableCell align="right">-200</TableCell>
-                  </TableRow>
-                </TableBody> */}
-
-                <TableBody>
-                  <TableRow>
-                    <TableCell component="th" scope="row">
-                    </TableCell>
-                    <TableCell align="left"></TableCell>
-                    <TableCell align="right"></TableCell>
-                    <TableCell align="right">
-                      <strong>NET TOTAL</strong>
-                    </TableCell>
-                    <TableCell align="right">
-                      <strong>30020</strong>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-                
-              </Table>
+              {
+                cartItems.length === 0 &&
+                <Card style={{width: '100%'}}>
+                  <h4 style={{textAlign: 'center', padding: '160px 100px'}}>Please add items to cart!</h4>
+                </Card>
+              }
             </TableContainer>
           
           </div>
@@ -240,7 +272,7 @@ export function SalesScreen() {
           <Button style={{background: 'red'}} className={classes.actionBtn} variant="contained" color="secondary">
             Clear
           </Button>
-          <Button className={classes.actionBtn} variant="contained" color="secondary">
+          <Button onClick={handlePlaceOrder} className={classes.actionBtn} variant="contained" color="secondary">
             Place Order
           </Button>
           
@@ -264,4 +296,4 @@ export function SalesScreen() {
       </Snackbar> */}
     </div>
   )
-}
+})

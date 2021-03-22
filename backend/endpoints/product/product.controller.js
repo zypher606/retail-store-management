@@ -87,6 +87,34 @@ class ProductController {
     res.status(200).send(new ResponseUtil(200, 'Results fetched successfully!!', result));
   }
 
+  placeOrder = async (req, res) => {
+    const payload = req.body;
+    const products = payload.products;
+
+    const invoice = {
+      id: uuidv4(),
+      netTotal: payload.netTotal,
+      dateCreated: Date.now(),
+    }
+    await DbService.insertNewInvoice(invoice);
+
+    for(const product of products) {
+      const sale = {
+        id: uuidv4(),
+        invoiceId: invoice.id, 
+        productId: product.id,
+        quantity: product.selectedCount, 
+        barcode: product.barcode,
+        dateCreated: Date.now(),
+      }
+      await DbService.insertNewSalesEntry(sale);
+      const existingProduct = await DbService.findProductByBarcde(product.barcode);
+      await DbService.updateProductByBarcode({ ...existingProduct, quantity: existingProduct.quantity - product.selectedCount })
+    }
+    res.status(200).send(new ResponseUtil(200, 'Order placed successfullt!!'));
+
+  }
+
 }
 
 function getProductControllerInstance() {

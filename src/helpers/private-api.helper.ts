@@ -16,3 +16,11 @@ export function addProductPurchase(data: any) {
     data
   );
 }
+
+export function placeOrder(data: any) {
+  const privateAxiosInstance = createPrivateAxiosInstance(BASE_URL);
+  return privateAxiosInstance.post(
+    `product/placeOrder`,
+    data
+  );
+}

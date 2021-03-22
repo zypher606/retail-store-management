@@ -12,6 +12,7 @@ import SendIcon from '@material-ui/icons/Send';
 import ExpandLess from '@material-ui/icons/ExpandLess';
 import ExpandMore from '@material-ui/icons/ExpandMore';
 import StarBorder from '@material-ui/icons/StarBorder';
+import { Avatar, Chip, ListItemAvatar } from '@material-ui/core';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -26,7 +27,7 @@ const useStyles = makeStyles((theme: Theme) =>
   }),
 );
 
-export default function ProductList() {
+export default function ProductList({productList=[], handleItemSelect}: any) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(true);
 
@@ -40,40 +41,33 @@ export default function ProductList() {
       aria-labelledby="nested-list-subheader"
       subheader={
         <ListSubheader component="div" id="nested-list-subheader">
-          Nested List Items
+          Product List
         </ListSubheader>
       }
       className={classes.root}
+      style={{
+        maxHeight: '600px',
+        overflowY: 'scroll',
+      }}
     >
-      <ListItem button>
-        <ListItemIcon>
-          <SendIcon />
-        </ListItemIcon>
-        <ListItemText primary="Sent mail" />
-      </ListItem>
-      <ListItem button>
-        <ListItemIcon>
-          <DraftsIcon />
-        </ListItemIcon>
-        <ListItemText primary="Drafts" />
-      </ListItem>
-      <ListItem button onClick={handleClick}>
-        <ListItemIcon>
-          <InboxIcon />
-        </ListItemIcon>
-        <ListItemText primary="Inbox" />
-        {open ? <ExpandLess /> : <ExpandMore />}
-      </ListItem>
-      <Collapse in={open} timeout="auto" unmountOnExit>
-        <List component="div" disablePadding>
-          <ListItem button className={classes.nested}>
-            <ListItemIcon>
-              <StarBorder />
-            </ListItemIcon>
-            <ListItemText primary="Starred" />
+      {
+        productList.map(({id, name, price, quantity, ...rest}: any) => (
+          <ListItem onClick={() => handleItemSelect({id, name, price, quantity, ...rest})} button key={id}>
+            <ListItemAvatar>
+              <Avatar>
+                {name[0]}
+              </Avatar>
+            </ListItemAvatar>
+            
+            <ListItemText primary={name} />
+            <Chip
+              label={`${quantity} Items`}
+              variant="outlined"
+            />
           </ListItem>
-        </List>
-      </Collapse>
+        ))
+      }
+      
     </List>
   );
 }
